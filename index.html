@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <!-- iPad/iOS Web App 配置 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="L'Essence">
+
+    <!-- App Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' style='background:%23FACC15'%3E%3Cpath fill='white' d='M256 48l-80 160h160L256 48zm-96 192l-64 128h320l-64-128H160zm-80 160l-32 64h416l-32-64H80z'/%3E%3C/svg%3E">
+
+    <title>L'Essence 香氛工坊 - Investor Presentation</title>
+
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- 設定字型與動畫 -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap');
+
+        body {
+            font-family: 'Noto Sans TC', 'Noto Sans SC', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+        }
+
+        /* iPad 安全區域修正 */
+        header {
+            padding-top: env(safe-area-inset-top);
+        }
+
+        /* Custom Scrollbar */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); }
+        }
+
+        @keyframes float-heart {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(-40px) scale(1.5); opacity: 0; }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        .animate-pulse-gold {
+            animation: pulse-gold 2s infinite;
+        }
+        .animate-float-heart {
+            animation: float-heart 2s ease-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen">
+    <div id="root"></div>
+
+    <!-- 引入 React 和 Babel -->
+    <script type="importmap">
+        {
+            "imports": {
+                "react": "https://esm.sh/react@18.2.0",
+                "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+                "lucide-react": "https://esm.sh/lucide-react@0.263.1"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import React, { useState, useEffect } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { Users, Target, Sparkles, Heart, Leaf, Star, ChevronDown, Share2, Globe, MessageCircle, ShoppingBag, Radio, Languages, Workflow, ArrowRight, Droplets, Scissors, SprayCan, Bath, Flame, Clapperboard, Play, Video, Mic, Aperture, HeartHandshake } from 'lucide-react';
+
+        // --- 翻譯數據 ---
+
+        // 繁體中文數據
+        const COMPANY_DATA_TC = {
+            name: "L'Essence 香氛工坊",
+            slogan: "高品質個人商店",
+            description: "捕捉記憶中的氣味，編織獨一無二的嗅覺故事。",
+            orgStructure: [
+                {
+                id: 0,
+                role: "品牌核心",
+                name: "L'Essence 香氛工坊",
+                icon: React.createElement(Sparkles, { className: "w-6 h-6 text-yellow-600" }),
+                description: "全身由上至下的高品質照顧",
+                color: "from-yellow-100 to-orange-100",
+                children: [
+                    {
+                    id: 1,
+                    role: "品牌內地業務",
+                    name: "燦哥",
+                    icon: React.createElement(Radio, { className: "w-5 h-5 text-red-500" }),
+                    description: "負責流量與變現",
+                    tags: ["小紅書", "抖音", "直播帶貨"],
+                    color: "from-red-50 to-pink-50",
+                    borderColor: "border-red-200"
+                    },
+                    {
+                    id: 2,
+                    role: "協調與落地",
+                    name: "林哥",
+                    icon: React.createElement(Users, { className: "w-5 h-5 text-blue-500" }),
+                    description: "內地、外地接洽工作",
+                    tags: ["工作協調", "提供落地意見", "資源整合"],
+                    color: "from-blue-50 to-indigo-50",
+                    borderColor: "border-blue-200"
+                    },
+                    {
+                    id: 3,
+                    role: "品牌外貿業務",
+                    name: "森哥",
+                    icon: React.createElement(Globe, { className: "w-5 h-5 text-green-500" }),
+                    description: "香港與東南亞市場",
+                    tags: ["香港: IG/FB 行銷", "深化品牌形象", "東南亞: Tiktok 引流"],
+                    color: "from-green-50 to-emerald-50",
+                    borderColor: "border-green-200"
+                    }
+                ]
+                }
+            ],
+            goals: {
+                top: {
+                title: "短期目標",
+                subtitle: "第一印象，瞬間吸引",
+                items: [
+                    { text: "提升 Instagram 互動率 20%", icon: "📈" },
+                    { text: "推出夏季限定「海鹽檸檬」系列", icon: "🍋" },
+                    { text: "優化線上試香體驗", icon: "🖱️" }
+                ],
+                icon: React.createElement(Star, { className: "w-8 h-8 text-yellow-500" }),
+                bg: "bg-yellow-50",
+                accent: "text-yellow-600"
+                },
+                heart: {
+                title: "核心目標",
+                subtitle: "品牌核心，持久連結",
+                items: [
+                    { text: "建立 VIP 會員訂閱制", icon: "👑" },
+                    { text: "拓展實體快閃店", icon: "🏪" },
+                    { text: "與在地藝術家聯名合作", icon: "🎨" }
+                ],
+                icon: React.createElement(Heart, { className: "w-8 h-8 text-rose-500" }),
+                bg: "bg-rose-50",
+                accent: "text-rose-600"
+                },
+                base: {
+                title: "長期願景",
+                subtitle: "餘韻悠長，永續發展",
+                items: [
+                    { text: "達成 100% 包裝可回收", icon: "♻️" },
+                    { text: "建立自有有機香草農場", icon: "🌱" }
+                ],
+                icon: React.createElement(Leaf, { className: "w-8 h-8 text-emerald-500" }),
+                bg: "bg-emerald-50",
+                accent: "text-emerald-600"
+                }
+            },
+            blueprint: {
+                mainTitle: "打造高品質個人商店",
+                subTitle: "由香水開始拓展的商業藍圖",
+                flowTitle: "複製成功配方路徑",
+                flowSteps: [
+                    { name: "名牌同款香水", desc: "如: YSL 同款" },
+                    { name: "同氣味沐浴露", desc: "延伸身體護理" },
+                    { name: "同氣味香薰", desc: "延伸空間氛圍" }
+                ],
+                keyInsight: "關鍵在於複製改良他人的配方",
+                categories: [
+                    { name: "頭髮造型", icon: "Scissors" },
+                    { name: "洗頭護髮", icon: "Droplets" },
+                    { name: "面部護理", icon: "Sparkles" },
+                    { name: "沐浴護理", icon: "Bath" },
+                    { name: "香體用品", icon: "SprayCan" },
+                    { name: "室內香薰", icon: "Flame" }
+                ]
+            },
+            videoConcepts: {
+                title: "短視頻內容矩陣",
+                subtitle: "從策劃到變現的完整生態",
+                gallery: [
+                    {
+                        title: "網紅種草推薦",
+                        tag: "口碑傳播",
+                        // 請替換為您的圖片 URL: 附件1 (粉色毛衣女生)
+                        image: "https://i.postimg.cc/W3ZqZKrB/IMG-0127.png=80&w=1000&auto=format&fit=crop",
+                        overlayText: "輕輕一噴 成日都好香",
+                        type: "review"
+                    },
+                    {
+                        title: "直播帶貨變現",
+                        tag: "即時轉化",
+                        // 請替換為您的圖片 URL: 附件2 (直播畫面)
+                        image: "https://i.postimg.cc/hjmQmwxN/IMG-0128.png=80&w=1000&auto=format&fit=crop",
+                        overlayText: "HK$877 立即下單",
+                        type: "live"
+                    },
+                    {
+                        title: "品牌形象展示",
+                        tag: "IP人設",
+                        // 請替換為您的圖片 URL: 附件3 (CHAVNK 女生)
+                        image: "https://i.postimg.cc/qRK6KYn9/IMG-0129.png=80&w=1000&auto=format&fit=crop",
+                        overlayText: "CHAVNK EAU DE PARFUM",
+                        type: "brand"
+                    },
+                    {
+                        title: "高品質海報",
+                        tag: "商業大片",
+                        // 請替換為您的圖片 URL: 附件4 (花海香水海報)
+                        image: "https://i.postimg.cc/26WLWJvM/IMG-0042.jpg=80&w=1000&auto=format&fit=crop",
+                        overlayText: "柔情邂逅 幸運降臨",
+                        type: "poster"
+                    }
+                ],
+                pricing: {
+                    planning: {
+                        title: "內容策劃及腳本",
+                        items: [
+                            { name: "劇情類/段子類", price: "6,500元 / 15條 (包月)" },
+                            { name: "帶貨口播", price: "8,000元 (包月不限條數)" },
+                            { name: "產品測評/種草", price: "7,000元 / 15條 (包月)" },
+                            { name: "IP人設號策劃", price: "13,000元 / 月 (含定位+剪輯)" }
+                        ]
+                    },
+                    shooting: {
+                        title: "短視頻代拍服務",
+                        items: [
+                            { name: "基礎套餐 (拍攝+剪輯)", price: "2,400元 / 30條 (月)" },
+                            { name: "產品展示視頻", price: "200-400元 / 條" },
+                            { name: "測評類視頻", price: "300-500元 / 條" },
+                            { name: "企業宣傳片/TVC", price: "6,000元起 / 條" }
+                        ]
+                    }
+                }
+            }
+        };
+
+        // 簡體中文數據
+        const COMPANY_DATA_SC = {
+            name: "L'Essence 香氛工坊",
+            slogan: "高品质个人商店",
+            description: "捕捉记忆中的气味，编织独一无二的嗅觉故事。",
+            orgStructure: [
+                {
+                id: 0,
+                role: "品牌核心",
+                name: "L'Essence 香氛工坊",
+                icon: React.createElement(Sparkles, { className: "w-6 h-6 text-yellow-600" }),
+                description: "全身由上至下的高品质照顾",
+                color: "from-yellow-100 to-orange-100",
+                children: [
+                    {
+                    id: 1,
+                    role: "品牌内地业务",
+                    name: "灿哥",
+                    icon: React.createElement(Radio, { className: "w-5 h-5 text-red-500" }),
+                    description: "负责流量与变现",
+                    tags: ["小红书", "抖音", "直播带货"],
+                    color: "from-red-50 to-pink-50",
+                    borderColor: "border-red-200"
+                    },
+                    {
+                    id: 2,
+                    role: "协调与落地",
+                    name: "林哥",
+                    icon: React.createElement(Users, { className: "w-5 h-5 text-blue-500" }),
+                    description: "内地、外地接洽工作",
+                    tags: ["工作协调", "提供落地意见", "资源整合"],
+                    color: "from-blue-50 to-indigo-50",
+                    borderColor: "border-blue-200"
+                    },
+                    {
+                    id: 3,
+                    role: "品牌外贸业务",
+                    name: "森哥",
+                    icon: React.createElement(Globe, { className: "w-5 h-5 text-green-500" }),
+                    description: "香港与东南亚市场",
+                    tags: ["香港: IG/FB 营销", "深化品牌形象", "东南亚: Tiktok 引流"],
+                    color: "from-green-50 to-emerald-50",
+                    borderColor: "border-green-200"
+                    }
+                ]
+                }
+            ],
+            goals: {
+                top: {
+                title: "短期目标",
+                subtitle: "第一印象，瞬间吸引",
+                items: [
+                    { text: "提升 Instagram 互动率 20%", icon: "📈" },
+                    { text: "推出夏季限定“海盐柠檬”系列", icon: "🍋" },
+                    { text: "优化线上试香体验", icon: "🖱️" }
+                ],
+                icon: React.createElement(Star, { className: "w-8 h-8 text-yellow-500" }),
+                bg: "bg-yellow-50",
+                accent: "text-yellow-600"
+                },
+                heart: {
+                title: "核心目标",
+                subtitle: "品牌核心，持久链接",
+                items: [
+                    { text: "建立 VIP 会员订阅制", icon: "👑" },
+                    { text: "拓展实体快闪店", icon: "🏪" },
+                    { text: "与在地艺术家联名合作", icon: "🎨" }
+                ],
+                icon: React.createElement(Heart, { className: "w-8 h-8 text-rose-500" }),
+                bg: "bg-rose-50",
+                accent: "text-rose-600"
+                },
+                base: {
+                title: "长期愿景",
+                subtitle: "余韵悠长，永续发展",
+                items: [
+                    { text: "达成 100% 包装可回收", icon: "♻️" },
+                    { text: "建立自有有机香草农场", icon: "🌱" }
+                ],
+                icon: React.createElement(Leaf, { className: "w-8 h-8 text-emerald-500" }),
+                bg: "bg-emerald-50",
+                accent: "text-emerald-600"
+                }
+            },
+            blueprint: {
+                mainTitle: "打造高品质个人商店",
+                subTitle: "由香水开始拓展的商业蓝图",
+                flowTitle: "复制成功配方路径",
+                flowSteps: [
+                    { name: "名牌同款香水", desc: "如: YSL 同款" },
+                    { name: "同气味沐浴露", desc: "延伸身体护理" },
+                    { name: "同气味香薰", desc: "延伸空间氛围" }
+                ],
+                keyInsight: "关键在于复制改良他人的配方",
+                categories: [
+                    { name: "头发造型", icon: "Scissors" },
+                    { name: "洗头护发", icon: "Droplets" },
+                    { name: "面部护理", icon: "Sparkles" },
+                    { name: "沐浴护理", icon: "Bath" },
+                    { name: "香体用品", icon: "SprayCan" },
+                    { name: "室内香薰", icon: "Flame" }
+                ]
+            },
+            videoConcepts: {
+                title: "短视频内容矩阵",
+                subtitle: "从策划到变现的完整生态",
+                gallery: [
+                    {
+                        title: "网红种草推荐",
+                        tag: "口碑传播",
+                        image: "https://i.postimg.cc/W3ZqZKrB/IMG-0127.png=80&w=1000&auto=format&fit=crop",
+                        overlayText: "轻轻一喷 成日都好香",
+                        type: "review"
+                    },
+                    {
+                        title: "直播带货变现",
+                        tag: "即时转化",
+                        image: "https://i.postimg.cc/hjmQmwxN/IMG-0128.png=80&w=1000&auto=format&fit=crop",
+                        overlayText: "HK$877 立即下单",
+                        type: "live"
+                    },
+                    {
+                        title: "品牌形象展示",
+                        tag: "IP人设",
+                        image: "https://i.postimg.cc/qRK6KYn9/IMG-0129.png=80&w=1000&auto=format&fit=crop",
+                        overlayText: "CHAVNK EAU DE PARFUM",
+                        type: "brand"
+                    },
+                    {
+                        title: "高品质海报",
+                        tag: "商业大片",
+                        image: "https://i.postimg.cc/26WLWJvM/IMG-0042.jpg=80&w=1000&auto=format&fit=crop",
+                        overlayText: "柔情邂逅 幸运降临",
+                        type: "poster"
+                    }
+                ],
+                pricing: {
+                    planning: {
+                        title: "内容策划及脚本",
+                        items: [
+                            { name: "剧情类/段子类", price: "6,500元 / 15条 (包月)" },
+                            { name: "带货口播", price: "8,000元 (包月不限条数)" },
+                            { name: "产品测评/种草", price: "7,000元 / 15条 (包月)" },
+                            { name: "IP人设号策划", price: "13,000元 / 月 (含定位+剪辑)" }
+                        ]
+                    },
+                    shooting: {
+                        title: "短视频代拍服务",
+                        items: [
+                            { name: "基础套餐 (拍摄+剪辑)", price: "2,400元 / 30条 (月)" },
+                            { name: "产品展示视频", price: "200-400元 / 条" },
+                            { name: "测评类视频", price: "300-500元 / 条" },
+                            { name: "企业宣传片/TVC", price: "6,000元起 / 条" }
+                        ]
+                    }
+                }
+            }
+        };
+
+        const UI_TEXT = {
+            structureBtn: { tc: "架構圖", sc: "架构图" },
+            goalsBtn: { tc: "目標策略", sc: "目标策略" },
+            blueprintBtn: { tc: "商業藍圖", sc: "商业蓝图" },
+            videoBtn: { tc: "短視頻概念", sc: "短视频概念" },
+            heroTitle: {
+                tc: ["從頭到腳的", "獨特造型", "體驗"],
+                sc: ["从头到脚的", "独特造型", "体验"]
+            },
+            footer: { tc: "內部管理系統", sc: "内部管理系统" }
+        };
+
+        // --- 組件 ---
+
+        // 1. 架構圖組件
+        const OrgCard = ({ data, isRoot = false }) => {
+            const [isOpen, setIsOpen] = useState(false);
+
+            return React.createElement("div", { className: "flex flex-col items-center" },
+                React.createElement("div", {
+                    className: `relative z-10 w-72 p-5 mb-6 transition-all duration-300 transform border-2 shadow-lg cursor-pointer rounded-2xl ${isRoot ? 'border-yellow-400 bg-gradient-to-br from-yellow-50 to-white scale-110' : `${data.borderColor || 'border-gray-100'} bg-white`}`,
+                    onClick: () => setIsOpen(!isOpen)
+                },
+                    React.createElement("div", { className: `absolute top-0 left-0 w-full h-2 rounded-t-xl bg-gradient-to-r ${data.color || 'from-gray-200 to-gray-300'}` }),
+                    React.createElement("div", { className: "flex items-center justify-between mb-3" },
+                        React.createElement("div", { className: "p-2 rounded-full bg-white shadow-sm border border-gray-100" }, data.icon),
+                        data.children && React.createElement(ChevronDown, { className: `w-5 h-5 text-gray-400 transition-transform duration-300 ${isOpen ? 'transform rotate-180' : ''}` })
+                    ),
+                    React.createElement("div", { className: "text-center" },
+                        React.createElement("h3", { className: "text-lg font-bold text-gray-800" }, data.name),
+                        React.createElement("p", { className: "text-purple-600 font-semibold text-sm mb-2" }, data.role),
+                        data.description && React.createElement("p", { className: "text-xs text-gray-500 mb-3" }, data.description),
+                        data.tags && React.createElement("div", { className: "flex flex-wrap justify-center gap-1.5 mt-2" },
+                            data.tags.map((tag, idx) =>
+                                React.createElement("span", { key: idx, className: "px-2 py-1 text-[10px] font-medium bg-gray-100 text-gray-600 rounded-full border border-gray-200" }, tag)
+                            )
+                        )
+                    )
+                ),
+                data.children && isOpen && React.createElement("div", { className: "flex flex-col items-center animate-fadeIn w-full" },
+                    React.createElement("div", { className: "w-0.5 h-8 bg-gray-300" }),
+                    React.createElement("div", { className: "relative flex flex-col md:flex-row justify-center gap-8 md:gap-4 pt-8 md:pt-4 border-l-2 md:border-l-0 md:border-t-2 border-gray-300 w-full md:w-auto" },
+                        React.createElement("div", { className: "md:hidden absolute top-0 left-0 h-full w-0.5 bg-gray-300 -translate-x-1/2" }),
+                        data.children.map((child) =>
+                            React.createElement("div", { key: child.id, className: "flex flex-col items-center px-2 relative" },
+                                React.createElement("div", { className: "absolute -top-4 md:-top-4 left-0 md:left-1/2 w-4 md:w-0.5 h-0.5 md:h-4 bg-gray-300 md:-translate-x-1/2" }),
+                                React.createElement(OrgCard, { data: child })
+                            )
+                        )
+                    )
+                )
+            );
+        };
+
+        // 2. 目標策略組件
+        const GoalCard = ({ noteType, data, delay }) => {
+            return React.createElement("div", {
+                className: `relative overflow-hidden rounded-3xl p-6 transition-all duration-500 transform ${data.bg} border border-white/50 group`,
+                style: { animation: `float 6s ease-in-out infinite ${delay}s` }
+            },
+                React.createElement("div", { className: "flex items-center gap-4 mb-6" },
+                    React.createElement("div", { className: "p-3 bg-white rounded-2xl shadow-sm group-hover:scale-110 transition-transform" }, data.icon),
+                    React.createElement("div", null,
+                        React.createElement("h3", { className: `text-xl font-bold ${data.accent}` }, data.title),
+                        React.createElement("p", { className: "text-sm font-medium text-gray-500" }, data.subtitle)
+                    )
+                ),
+                React.createElement("div", { className: "space-y-3 relative z-10" },
+                    data.items.map((item, idx) =>
+                        React.createElement("div", { key: idx, className: "flex items-center gap-3 p-3 bg-white/70 rounded-xl transition-all hover:bg-white hover:shadow-md" },
+                            React.createElement("span", { className: "text-lg" }, item.icon),
+                            React.createElement("span", { className: "text-gray-700 font-medium text-sm" }, item.text)
+                        )
+                    )
+                ),
+                React.createElement("div", { className: `absolute -bottom-10 -right-10 w-40 h-40 rounded-full opacity-20 filter blur-3xl transition-transform duration-700 ${noteType === 'top' ? 'bg-yellow-400' : noteType === 'heart' ? 'bg-rose-400' : 'bg-emerald-400'} group-hover:scale-150` })
+            );
+        };
+
+        // 3. 商業藍圖組件
+        const BlueprintView = ({ data }) => {
+            const getIcon = (name) => {
+                switch(name) {
+                    case 'Scissors': return React.createElement(Scissors, { className: "w-8 h-8" });
+                    case 'Droplets': return React.createElement(Droplets, { className: "w-8 h-8" });
+                    case 'Sparkles': return React.createElement(Sparkles, { className: "w-8 h-8" });
+                    case 'Bath': return React.createElement(Bath, { className: "w-8 h-8" });
+                    case 'SprayCan': return React.createElement(SprayCan, { className: "w-8 h-8" });
+                    case 'Flame': return React.createElement(Flame, { className: "w-8 h-8" });
+                    default: return React.createElement(Star, { className: "w-8 h-8" });
+                }
+            };
+
+            return React.createElement("div", { className: "animate-fadeIn w-full max-w-5xl mx-auto" },
+                React.createElement("div", { className: "text-center mb-10" },
+                    React.createElement("h2", { className: "text-3xl font-bold text-amber-600 mb-2 drop-shadow-sm" }, data.mainTitle),
+                    React.createElement("div", { className: "inline-block bg-gradient-to-r from-amber-600 to-yellow-500 text-white px-6 py-1.5 rounded-full shadow-md font-bold text-lg tracking-wide" },
+                        `★ ${data.subTitle} ★`
+                    )
+                ),
+                React.createElement("div", { className: "bg-gradient-to-b from-amber-50 to-white rounded-[2.5rem] p-6 md:p-10 shadow-xl border border-amber-100" },
+                    React.createElement("div", { className: "flex flex-col md:flex-row items-center justify-center gap-6 md:gap-4 mb-12" },
+                         data.flowSteps.map((step, idx) => [
+                            React.createElement("div", { key: `step-${idx}`, className: "flex flex-col items-center group" },
+                                React.createElement("div", { className: "w-24 h-24 md:w-28 md:h-28 bg-white rounded-2xl shadow-lg border-2 border-amber-200 flex flex-col items-center justify-center mb-4 transition-transform group-hover:-translate-y-2" },
+                                    idx === 0 ? React.createElement(SprayCan, { className: "w-10 h-10 text-amber-600 mb-2" }) :
+                                    idx === 1 ? React.createElement(Droplets, { className: "w-10 h-10 text-amber-600 mb-2" }) :
+                                    React.createElement(Flame, { className: "w-10 h-10 text-amber-600 mb-2" }),
+                                    React.createElement("span", { className: "text-[10px] text-gray-400 font-mono" }, `Step 0${idx+1}`)
+                                ),
+                                React.createElement("h4", { className: "font-bold text-gray-800 text-base md:text-lg mb-1" }, step.name),
+                                React.createElement("span", { className: "text-xs text-gray-500 bg-amber-100 px-2 py-0.5 rounded-full" }, step.desc)
+                            ),
+                            idx < data.flowSteps.length - 1 && React.createElement(ArrowRight, { key: `arrow-${idx}`, className: "text-amber-300 w-10 h-10 rotate-90 md:rotate-0 animate-pulse" })
+                         ])
+                    ),
+                    React.createElement("div", { className: "relative max-w-lg mx-auto mb-16" },
+                        React.createElement("div", { className: "bg-gradient-to-r from-yellow-400 to-amber-500 text-white p-4 rounded-xl shadow-lg text-center transform hover:scale-105 transition-transform z-10 relative" },
+                            React.createElement("div", { className: "flex items-center justify-center gap-3" },
+                                React.createElement(Star, { className: "fill-white text-yellow-200 w-6 h-6 animate-spin-slow" }),
+                                React.createElement("p", { className: "font-bold text-xl tracking-wide" }, data.keyInsight)
+                            )
+                        )
+                    ),
+                    React.createElement("div", { className: "relative" },
+                         React.createElement("div", { className: "absolute top-6 left-4 right-4 h-0.5 bg-amber-200 hidden md:block" }),
+                         React.createElement("div", { className: "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 relative z-10" },
+                            data.categories.map((cat, idx) =>
+                                React.createElement("div", { key: idx, className: "flex flex-col items-center group cursor-pointer" },
+                                    React.createElement("div", { className: "h-6 w-0.5 bg-amber-200 mb-0 hidden md:block" }),
+                                    React.createElement("div", { className: "w-20 h-20 rounded-full bg-white border-2 border-amber-300 shadow-md flex items-center justify-center text-amber-600 transition-all group-hover:bg-amber-50 group-hover:border-amber-500 group-hover:scale-110" },
+                                        getIcon(cat.icon)
+                                    ),
+                                    React.createElement("span", { className: "mt-3 font-bold text-gray-700 bg-amber-100/50 px-3 py-1 rounded-lg text-sm group-hover:bg-amber-200/50 transition-colors" }, cat.name)
+                                )
+                            )
+                         )
+                    )
+                )
+            );
+        };
+
+        // 4. 短視頻概念組件
+        const VideoConceptsView = ({ data }) => {
+            // Helper Component: Phone Mockup
+            const PhoneFrame = ({ item }) => (
+                React.createElement("div", { className: "relative w-[280px] h-[580px] bg-gray-900 rounded-[35px] border-8 border-gray-900 shadow-2xl overflow-hidden shrink-0 mx-4 snap-center transform hover:scale-105 transition-transform duration-300 group" },
+                    // Notch
+                    React.createElement("div", { className: "absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-gray-900 rounded-b-xl z-20" }),
+
+                    // Image Content
+                    React.createElement("img", { src: item.image, className: "w-full h-full object-cover opacity-90 transition-opacity group-hover:opacity-100", alt: item.title }),
+
+                    // Live UI Overlays
+                    item.type === 'live' && React.createElement("div", { className: "absolute top-4 right-4 bg-pink-500 text-white text-[10px] px-2 py-0.5 rounded-full animate-pulse z-10" }, "LIVE"),
+                    item.type === 'live' && React.createElement("div", { className: "absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent" },
+                        React.createElement("div", { className: "flex items-center gap-2 mb-2" },
+                            React.createElement("div", { className: "w-8 h-8 rounded-full bg-gray-200 border-2 border-white" }),
+                            React.createElement("div", { className: "text-white text-xs" },
+                                React.createElement("div", { className: "font-bold" }, "香氣小館"),
+                                React.createElement("div", { className: "opacity-80" }, "正在直播推薦...")
+                            )
+                        ),
+                        React.createElement("div", { className: "bg-pink-600 text-white text-center py-2 rounded-lg font-bold shadow-lg animate-bounce" },
+                            item.overlayText
+                        )
+                    ),
+
+                    // Review UI Overlays (Bubbles)
+                    item.type === 'review' && React.createElement("div", { className: "absolute bottom-12 left-4 right-4" },
+                        React.createElement("div", { className: "bg-white/95 backdrop-blur-md p-3 rounded-2xl rounded-bl-none shadow-xl border border-gray-200" },
+                             React.createElement("p", { className: "text-gray-800 text-center font-medium" }, item.overlayText)
+                        )
+                    ),
+
+                    // Brand UI Overlays (Minimalist)
+                    item.type === 'brand' && React.createElement("div", { className: "absolute top-1/2 left-0 right-0 -translate-y-1/2 text-center" },
+                         React.createElement("div", { className: "inline-block border-y-2 border-white/80 py-2 px-4" },
+                            React.createElement("h3", { className: "text-2xl text-white font-serif tracking-widest drop-shadow-md" }, "CHAVNK"),
+                            React.createElement("p", { className: "text-white/90 text-[10px] tracking-[0.2em] mt-1 uppercase" }, "Eau De Parfum")
+                         )
+                    ),
+
+                    // Poster UI Overlays (Full Screen Text)
+                    item.type === 'poster' && React.createElement("div", { className: "absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/30 flex flex-col justify-between p-6" },
+                        React.createElement("div", { className: "text-center mt-8" },
+                            React.createElement("h2", { className: "text-4xl text-[#D4AF37] font-serif font-bold tracking-wider drop-shadow-xl" }, "CHAVNK"),
+                             React.createElement("p", { className: "text-[#D4AF37]/80 text-xs tracking-[0.3em] mt-2" }, "EAU DE PARFUM")
+                        ),
+                        React.createElement("div", { className: "text-center mb-8" },
+                            React.createElement("p", { className: "text-white text-lg font-serif tracking-widest drop-shadow-md" }, item.overlayText)
+                        )
+                    ),
+
+                    // Floating Hearts Animation for Live
+                    item.type === 'live' && React.createElement("div", { className: "absolute bottom-20 right-4" },
+                         React.createElement(Heart, { className: "text-pink-400 fill-pink-400 w-6 h-6 animate-float-heart", style: { animationDelay: '0s' } }),
+                         React.createElement(Heart, { className: "text-pink-300 fill-pink-300 w-4 h-4 animate-float-heart absolute -right-2 top-4", style: { animationDelay: '0.5s' } })
+                    )
+                )
+            );
+
+            // Helper Component: Pricing Card
+            const PriceCard = ({ sectionData, icon, colorClass }) => (
+                React.createElement("div", { className: "bg-white rounded-3xl p-6 shadow-xl border border-gray-100 flex-1 min-w-[300px]" },
+                    React.createElement("div", { className: `flex items-center gap-3 mb-6 pb-4 border-b border-gray-100 ${colorClass}` },
+                        icon,
+                        React.createElement("h3", { className: "text-xl font-bold text-gray-800" }, sectionData.title)
+                    ),
+                    React.createElement("div", { className: "space-y-4" },
+                        sectionData.items.map((item, idx) =>
+                            React.createElement("div", { key: idx, className: "flex justify-between items-start group" },
+                                React.createElement("span", { className: "text-gray-600 font-medium group-hover:text-gray-900 transition-colors" }, item.name),
+                                React.createElement("span", { className: "text-amber-600 font-bold text-right bg-amber-50 px-2 py-0.5 rounded-md text-sm" }, item.price)
+                            )
+                        )
+                    )
+                )
+            );
+
+            return React.createElement("div", { className: "animate-fadeIn w-full max-w-6xl mx-auto space-y-16" },
+                // Section 1: Visual Gallery (Horizontal Scroll)
+                React.createElement("div", { className: "space-y-6" },
+                     React.createElement("div", { className: "flex items-center justify-between px-4" },
+                        React.createElement("h2", { className: "text-2xl font-bold text-gray-800 flex items-center gap-2" },
+                            React.createElement(Clapperboard, { className: "text-pink-500" }),
+                            data.title
+                        ),
+                        React.createElement("span", { className: "text-sm text-gray-400" }, "Swipe to view cases →")
+                     ),
+                     React.createElement("div", { className: "flex overflow-x-auto pb-10 px-4 snap-x hide-scrollbar gap-6 justify-start md:justify-center" },
+                        data.gallery.map((item, idx) => React.createElement(PhoneFrame, { key: idx, item: item }))
+                     )
+                ),
+
+                // Section 2: Pricing Matrix
+                React.createElement("div", { className: "px-4" },
+                    React.createElement("div", { className: "text-center mb-8" },
+                         React.createElement("h2", { className: "text-2xl font-bold text-gray-800" }, "專業服務報價"),
+                         React.createElement("p", { className: "text-gray-500 mt-2" }, data.subtitle)
+                    ),
+                    React.createElement("div", { className: "flex flex-col md:flex-row gap-8" },
+                        React.createElement(PriceCard, {
+                            sectionData: data.pricing.planning,
+                            icon: React.createElement(Sparkles, { className: "w-6 h-6" }),
+                            colorClass: "text-purple-500"
+                        }),
+                        React.createElement(PriceCard, {
+                            sectionData: data.pricing.shooting,
+                            icon: React.createElement(Video, { className: "w-6 h-6" }),
+                            colorClass: "text-blue-500"
+                        })
+                    )
+                )
+            );
+        };
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('structure');
+            const [lang, setLang] = useState('tc');
+
+            const currentData = lang === 'tc' ? COMPANY_DATA_TC : COMPANY_DATA_SC;
+            const toggleLang = () => setLang(prev => prev === 'tc' ? 'sc' : 'tc');
+
+            return React.createElement("div", { className: "min-h-screen bg-slate-50 selection:bg-yellow-200" },
+                React.createElement("header", { className: "bg-white border-b border-gray-200 sticky top-0 z-50" },
+                    React.createElement("div", { className: "max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between" },
+                        React.createElement("div", { className: "flex items-center gap-3 mb-4 md:mb-0" },
+                            React.createElement("div", { className: "bg-yellow-400 p-2 rounded-lg text-white shadow-md" }, React.createElement(Sparkles, { size: 24 })),
+                            React.createElement("div", null,
+                                React.createElement("h1", { className: "text-2xl font-bold text-gray-800 tracking-tight" }, currentData.name),
+                                React.createElement("p", { className: "text-xs text-gray-500 font-medium tracking-widest uppercase" }, currentData.slogan)
+                            )
+                        ),
+                        React.createElement("nav", { className: "flex bg-gray-100 p-1 rounded-xl items-center overflow-x-auto max-w-full" },
+                            React.createElement("button", {
+                                onClick: () => setActiveTab('structure'),
+                                className: `flex items-center gap-2 px-3 md:px-5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap transition-all duration-300 ${activeTab === 'structure' ? 'bg-white text-gray-800 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`
+                            }, React.createElement(Users, { size: 18 }), UI_TEXT.structureBtn[lang]),
+
+                            React.createElement("button", {
+                                onClick: () => setActiveTab('goals'),
+                                className: `flex items-center gap-2 px-3 md:px-5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap transition-all duration-300 ${activeTab === 'goals' ? 'bg-white text-indigo-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`
+                            }, React.createElement(Target, { size: 18 }), UI_TEXT.goalsBtn[lang]),
+
+                            React.createElement("button", {
+                                onClick: () => setActiveTab('blueprint'),
+                                className: `flex items-center gap-2 px-3 md:px-5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap transition-all duration-300 ${activeTab === 'blueprint' ? 'bg-white text-amber-600 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`
+                            }, React.createElement(Workflow, { size: 18 }), UI_TEXT.blueprintBtn[lang]),
+
+                            // New Video Concepts Button
+                            React.createElement("button", {
+                                onClick: () => setActiveTab('video'),
+                                className: `flex items-center gap-2 px-3 md:px-5 py-2.5 rounded-lg text-sm font-bold whitespace-nowrap transition-all duration-300 ${activeTab === 'video' ? 'bg-white text-pink-500 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`
+                            }, React.createElement(Clapperboard, { size: 18 }), UI_TEXT.videoBtn[lang]),
+
+                            React.createElement("div", { className: "w-px h-6 bg-gray-300 mx-1 flex-shrink-0" }),
+                            React.createElement("button", {
+                                onClick: toggleLang,
+                                className: "flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-200 transition-colors whitespace-nowrap"
+                            },
+                                React.createElement(Languages, { size: 18 }),
+                                React.createElement("span", { className: "font-bold" }, lang === 'tc' ? '繁' : '简')
+                            )
+                        )
+                    )
+                ),
+                React.createElement("main", { className: "max-w-7xl mx-auto px-4 py-8 md:py-12 safe-area-padding" },
+
+                    // Show Hero Text only on Structure and Goals tabs
+                    (activeTab === 'structure' || activeTab === 'goals') && React.createElement("div", { className: "text-center mb-16 max-w-3xl mx-auto animate-fadeIn" },
+                        React.createElement("h2", { className: "text-2xl md:text-3xl font-bold text-gray-800 mb-6 leading-tight" },
+                            UI_TEXT.heroTitle[lang][0],
+                            React.createElement("span", { className: "text-yellow-500 inline-block transform -rotate-2 bg-yellow-100 px-2 rounded-lg mx-1" }, UI_TEXT.heroTitle[lang][1]),
+                            UI_TEXT.heroTitle[lang][2]
+                        ),
+                        React.createElement("p", { className: "text-base md:text-lg text-gray-600 leading-relaxed bg-white/50 p-6 rounded-2xl shadow-sm border border-gray-100" }, currentData.description)
+                    ),
+
+                    // Render Content
+                    activeTab === 'structure' ?
+                        React.createElement("div", { className: "flex justify-center overflow-x-auto pb-12 animate-fadeIn min-h-[600px] w-full" },
+                            React.createElement("div", { className: "min-w-fit px-4 pt-4" },
+                                React.createElement(OrgCard, { data: currentData.orgStructure[0], isRoot: true })
+                            )
+                        ) : activeTab === 'goals' ?
+                        React.createElement("div", { className: "grid grid-cols-1 md:grid-cols-3 gap-8 px-4 animate-fadeIn max-w-6xl mx-auto pb-20" },
+                            React.createElement(GoalCard, { noteType: "top", data: currentData.goals.top, delay: 0 }),
+                            React.createElement(GoalCard, { noteType: "heart", data: currentData.goals.heart, delay: 1.5 }),
+                            React.createElement(GoalCard, { noteType: "base", data: currentData.goals.base, delay: 3 })
+                        ) : activeTab === 'blueprint' ?
+                        React.createElement(BlueprintView, { data: currentData.blueprint })
+                        :
+                        // Video Concepts Tab
+                        React.createElement(VideoConceptsView, { data: currentData.videoConcepts })
+                ),
+                React.createElement("footer", { className: "border-t border-gray-200 py-8 text-center text-gray-400 text-sm bg-white pb-safe" },
+                    React.createElement("p", null, `© 2026 L'Essence 香氛工坊 (Perfume Shop) ${UI_TEXT.footer[lang]}`)
+                )
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(React.createElement(App));
+    </script>
+</body>
+</html>
+
